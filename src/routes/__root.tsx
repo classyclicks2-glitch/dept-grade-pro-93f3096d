@@ -80,9 +80,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Grading — Department Grading App" },
       { name: "description", content: "Password-gated departmental grading and attendance tracking." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Department Grading" },
-      { property: "og:description", content: "Internal grading tool." },
+      { property: "og:title", content: "Grading — Department Grading App" },
+      { property: "og:description", content: "Password-gated departmental grading and attendance tracking." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Grading — Department Grading App" },
+      { name: "twitter:description", content: "Password-gated departmental grading and attendance tracking." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/983f1385-7582-43ad-b944-4ae5ca366331/id-preview-a4ba41e3--5c81d017-ff95-472a-b259-1d05d5807684.lovable.app-1783530934782.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/983f1385-7582-43ad-b944-4ae5ca366331/id-preview-a4ba41e3--5c81d017-ff95-472a-b259-1d05d5807684.lovable.app-1783530934782.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
