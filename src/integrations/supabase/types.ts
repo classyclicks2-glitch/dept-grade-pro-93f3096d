@@ -14,7 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      departments: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      grades: {
+        Row: {
+          created_at: string
+          created_by_dept: string | null
+          da_task_detail: string | null
+          da_task_grade: number | null
+          date: string
+          dept_task_detail: string | null
+          dept_task_grade: number | null
+          ethics: Database["public"]["Enums"]["ethics_rating"] | null
+          ethics_comment: string | null
+          ethics_grade: number | null
+          hod_grade: number | null
+          hod_remarks: string | null
+          hr_task_detail: string | null
+          hr_task_grade: number | null
+          id: string
+          is_auto_na: boolean
+          mkt_task_detail: string | null
+          mkt_task_grade: number | null
+          other_grade: number | null
+          other_remarks: string | null
+          person_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_dept?: string | null
+          da_task_detail?: string | null
+          da_task_grade?: number | null
+          date: string
+          dept_task_detail?: string | null
+          dept_task_grade?: number | null
+          ethics?: Database["public"]["Enums"]["ethics_rating"] | null
+          ethics_comment?: string | null
+          ethics_grade?: number | null
+          hod_grade?: number | null
+          hod_remarks?: string | null
+          hr_task_detail?: string | null
+          hr_task_grade?: number | null
+          id?: string
+          is_auto_na?: boolean
+          mkt_task_detail?: string | null
+          mkt_task_grade?: number | null
+          other_grade?: number | null
+          other_remarks?: string | null
+          person_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_dept?: string | null
+          da_task_detail?: string | null
+          da_task_grade?: number | null
+          date?: string
+          dept_task_detail?: string | null
+          dept_task_grade?: number | null
+          ethics?: Database["public"]["Enums"]["ethics_rating"] | null
+          ethics_comment?: string | null
+          ethics_grade?: number | null
+          hod_grade?: number | null
+          hod_remarks?: string | null
+          hr_task_detail?: string | null
+          hr_task_grade?: number | null
+          id?: string
+          is_auto_na?: boolean
+          mkt_task_detail?: string | null
+          mkt_task_grade?: number | null
+          other_grade?: number | null
+          other_remarks?: string | null
+          person_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grades_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      people: {
+        Row: {
+          created_at: string
+          department_slug: string
+          email: string | null
+          id: string
+          instagram: string | null
+          leave_end: string | null
+          leave_start: string | null
+          name: string
+          phone: string | null
+          role: string | null
+          status: Database["public"]["Enums"]["person_status"]
+          status_reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department_slug: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          leave_end?: string | null
+          leave_start?: string | null
+          name: string
+          phone?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["person_status"]
+          status_reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department_slug?: string
+          email?: string | null
+          id?: string
+          instagram?: string | null
+          leave_end?: string | null
+          leave_start?: string | null
+          name?: string
+          phone?: string | null
+          role?: string | null
+          status?: Database["public"]["Enums"]["person_status"]
+          status_reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "people_department_slug_fkey"
+            columns: ["department_slug"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      status_history: {
+        Row: {
+          changed_at: string
+          changed_by_dept: string | null
+          id: string
+          leave_end: string | null
+          leave_start: string | null
+          person_id: string
+          reason: string | null
+          status: Database["public"]["Enums"]["person_status"]
+        }
+        Insert: {
+          changed_at?: string
+          changed_by_dept?: string | null
+          id?: string
+          leave_end?: string | null
+          leave_start?: string | null
+          person_id: string
+          reason?: string | null
+          status: Database["public"]["Enums"]["person_status"]
+        }
+        Update: {
+          changed_at?: string
+          changed_by_dept?: string | null
+          id?: string
+          leave_end?: string | null
+          leave_start?: string | null
+          person_id?: string
+          reason?: string | null
+          status?: Database["public"]["Enums"]["person_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "status_history_person_id_fkey"
+            columns: ["person_id"]
+            isOneToOne: false
+            referencedRelation: "people"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +223,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      ethics_rating: "good" | "bad" | "na"
+      person_status:
+        | "active"
+        | "on_leave"
+        | "inactive"
+        | "terminated"
+        | "resigned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +356,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      ethics_rating: ["good", "bad", "na"],
+      person_status: [
+        "active",
+        "on_leave",
+        "inactive",
+        "terminated",
+        "resigned",
+      ],
+    },
   },
 } as const
