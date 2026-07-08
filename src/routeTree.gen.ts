@@ -9,38 +9,160 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnlockRouteImport } from './routes/unlock'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as StatusPersonIdRouteImport } from './routes/status.$personId'
+import { Route as PeopleNewRouteImport } from './routes/people.new'
+import { Route as GradePersonIdRouteImport } from './routes/grade.$personId'
+import { Route as AdminVaultRouteImport } from './routes/admin.vault'
+import { Route as AdminPersonPersonIdRouteImport } from './routes/admin.person.$personId'
 
+const UnlockRoute = UnlockRouteImport.update({
+  id: '/unlock',
+  path: '/unlock',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusPersonIdRoute = StatusPersonIdRouteImport.update({
+  id: '/status/$personId',
+  path: '/status/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PeopleNewRoute = PeopleNewRouteImport.update({
+  id: '/people/new',
+  path: '/people/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GradePersonIdRoute = GradePersonIdRouteImport.update({
+  id: '/grade/$personId',
+  path: '/grade/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminVaultRoute = AdminVaultRouteImport.update({
+  id: '/admin/vault',
+  path: '/admin/vault',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPersonPersonIdRoute = AdminPersonPersonIdRouteImport.update({
+  id: '/admin/person/$personId',
+  path: '/admin/person/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/unlock': typeof UnlockRoute
+  '/admin/vault': typeof AdminVaultRoute
+  '/grade/$personId': typeof GradePersonIdRoute
+  '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/person/$personId': typeof AdminPersonPersonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/unlock': typeof UnlockRoute
+  '/admin/vault': typeof AdminVaultRoute
+  '/grade/$personId': typeof GradePersonIdRoute
+  '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/person/$personId': typeof AdminPersonPersonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/unlock': typeof UnlockRoute
+  '/admin/vault': typeof AdminVaultRoute
+  '/grade/$personId': typeof GradePersonIdRoute
+  '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/person/$personId': typeof AdminPersonPersonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/admin/vault'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
+    | '/admin/'
+    | '/admin/person/$personId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/admin/vault'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
+    | '/admin'
+    | '/admin/person/$personId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/admin/vault'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
+    | '/admin/'
+    | '/admin/person/$personId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  UnlockRoute: typeof UnlockRoute
+  AdminVaultRoute: typeof AdminVaultRoute
+  GradePersonIdRoute: typeof GradePersonIdRoute
+  PeopleNewRoute: typeof PeopleNewRoute
+  StatusPersonIdRoute: typeof StatusPersonIdRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminPersonPersonIdRoute: typeof AdminPersonPersonIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unlock': {
+      id: '/unlock'
+      path: '/unlock'
+      fullPath: '/unlock'
+      preLoaderRoute: typeof UnlockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +170,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status/$personId': {
+      id: '/status/$personId'
+      path: '/status/$personId'
+      fullPath: '/status/$personId'
+      preLoaderRoute: typeof StatusPersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/people/new': {
+      id: '/people/new'
+      path: '/people/new'
+      fullPath: '/people/new'
+      preLoaderRoute: typeof PeopleNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/grade/$personId': {
+      id: '/grade/$personId'
+      path: '/grade/$personId'
+      fullPath: '/grade/$personId'
+      preLoaderRoute: typeof GradePersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/vault': {
+      id: '/admin/vault'
+      path: '/admin/vault'
+      fullPath: '/admin/vault'
+      preLoaderRoute: typeof AdminVaultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/person/$personId': {
+      id: '/admin/person/$personId'
+      path: '/admin/person/$personId'
+      fullPath: '/admin/person/$personId'
+      preLoaderRoute: typeof AdminPersonPersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  UnlockRoute: UnlockRoute,
+  AdminVaultRoute: AdminVaultRoute,
+  GradePersonIdRoute: GradePersonIdRoute,
+  PeopleNewRoute: PeopleNewRoute,
+  StatusPersonIdRoute: StatusPersonIdRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  AdminPersonPersonIdRoute: AdminPersonPersonIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
