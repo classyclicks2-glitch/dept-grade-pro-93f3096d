@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnlockRouteImport } from './routes/unlock'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StatusPersonIdRouteImport } from './routes/status.$personId'
 import { Route as PeopleNewRouteImport } from './routes/people.new'
+import { Route as GradePersonIdRouteImport } from './routes/grade.$personId'
 
 const UnlockRoute = UnlockRouteImport.update({
   id: '/unlock',
@@ -29,9 +31,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StatusPersonIdRoute = StatusPersonIdRouteImport.update({
+  id: '/status/$personId',
+  path: '/status/$personId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PeopleNewRoute = PeopleNewRouteImport.update({
   id: '/people/new',
   path: '/people/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GradePersonIdRoute = GradePersonIdRouteImport.update({
+  id: '/grade/$personId',
+  path: '/grade/$personId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +51,61 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
+  '/status/$personId': typeof StatusPersonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/unlock' | '/people/new'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/unlock' | '/people/new'
-  id: '__root__' | '/' | '/dashboard' | '/unlock' | '/people/new'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/unlock'
+    | '/grade/$personId'
+    | '/people/new'
+    | '/status/$personId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   UnlockRoute: typeof UnlockRoute
+  GradePersonIdRoute: typeof GradePersonIdRoute
   PeopleNewRoute: typeof PeopleNewRoute
+  StatusPersonIdRoute: typeof StatusPersonIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +131,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/status/$personId': {
+      id: '/status/$personId'
+      path: '/status/$personId'
+      fullPath: '/status/$personId'
+      preLoaderRoute: typeof StatusPersonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/people/new': {
       id: '/people/new'
       path: '/people/new'
       fullPath: '/people/new'
       preLoaderRoute: typeof PeopleNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/grade/$personId': {
+      id: '/grade/$personId'
+      path: '/grade/$personId'
+      fullPath: '/grade/$personId'
+      preLoaderRoute: typeof GradePersonIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,7 +159,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   UnlockRoute: UnlockRoute,
+  GradePersonIdRoute: GradePersonIdRoute,
   PeopleNewRoute: PeopleNewRoute,
+  StatusPersonIdRoute: StatusPersonIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
