@@ -15,13 +15,17 @@ export function AppHeader({
   const router = useRouter();
   const doLock = useServerFn(lock);
   return (
-    <header className="border-b bg-card">
+    <header className="bg-card border-b">
+      <div className="h-1.5 rainbow-bar" />
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
-        <div>
-          <Link to="/" className="text-lg font-semibold hover:underline">
-            {title}
-          </Link>
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        <div className="flex items-center gap-2">
+          <span className="text-2xl unicorn-float" aria-hidden>🦄</span>
+          <div>
+            <Link to="/" className="text-lg font-semibold unicorn-text hover:underline">
+              {title}
+            </Link>
+            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {right}
