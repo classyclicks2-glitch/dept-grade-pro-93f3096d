@@ -206,7 +206,11 @@ function GradePage() {
           </div>
         </section>
 
-        {msg && <p className="text-sm">{msg}</p>}
+        <div className="rounded-2xl unicorn-gradient p-4 text-white shadow-[var(--shadow-unicorn)] flex items-center justify-between">
+          <span className="text-sm opacity-90">Total for {date}</span>
+          <span className="text-2xl font-bold">{dayTotal.toFixed(1)}</span>
+        </div>
+        {msg && <p className="text-sm font-medium text-primary">{msg}</p>}
         <div className="flex gap-2">
           <Button onClick={submit} disabled={busy}>
             {busy ? "Saving…" : "Save grade"}
