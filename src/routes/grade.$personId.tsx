@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
@@ -42,6 +42,7 @@ function todayISO() {
 function GradePage() {
   const { s, person } = Route.useLoaderData();
   const router = useRouter();
+  const qc = useQueryClient();
   const fetchGrade = useServerFn(getGrade);
   const save = useServerFn(saveGrade);
   const [date, setDate] = useState(todayISO());
@@ -49,7 +50,7 @@ function GradePage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const { data: existing } = useQuery({
+  const { data: existing, refetch } = useQuery({
     queryKey: ["grade", person.id, date],
     queryFn: () => fetchGrade({ data: { personId: person.id, date } }),
   });
@@ -62,6 +63,14 @@ function GradePage() {
   const set = (k: string, v: any) => setForm((f: any) => ({ ...f, [k]: v }));
 
   const isOnLeave = person.status === "on_leave" && date >= (person.leave_start ?? "") && date <= (person.leave_end ?? "");
+
+  const dayTotal =
+    (Number(form.dept_task_grade) || 0) +
+    (Number(form.da_task_grade) || 0) +
+    (Number(form.mkt_task_grade) || 0) +
+    (Number(form.hr_task_grade) || 0) +
+    (Number(form.ethics_grade) || 0) +
+    (Number(form.other_grade) || 0);
 
   async function submit() {
     setBusy(true);
@@ -86,7 +95,11 @@ function GradePage() {
           other_grade: numOrNull(form.other_grade),
         },
       });
-      setMsg("Saved.");
+      await qc.invalidateQueries({ queryKey: ["grade", person.id, date] });
+      await qc.invalidateQueries({ queryKey: ["totals"] });
+      await qc.invalidateQueries({ queryKey: ["admin", "totals"] });
+      await refetch();
+      setMsg(`Mark added · today's total ${dayTotal.toFixed(1)}`);
     } catch (e) {
       setMsg((e as Error).message);
     } finally {
@@ -193,7 +206,11 @@ function GradePage() {
           </div>
         </section>
 
-        {msg && <p className="text-sm">{msg}</p>}
+        <div className="rounded-2xl unicorn-gradient p-4 text-white shadow-[var(--shadow-unicorn)] flex items-center justify-between">
+          <span className="text-sm opacity-90">Total for {date}</span>
+          <span className="text-2xl font-bold">{dayTotal.toFixed(1)}</span>
+        </div>
+        {msg && <p className="text-sm font-medium text-primary">{msg}</p>}
         <div className="flex gap-2">
           <Button onClick={submit} disabled={busy}>
             {busy ? "Saving…" : "Save grade"}
