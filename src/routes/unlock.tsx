@@ -41,12 +41,14 @@ function UnlockPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background p-6">
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border bg-card p-8 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-semibold">Enter password</h1>
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-sm space-y-6 rounded-3xl border bg-card p-8 shadow-[var(--shadow-unicorn)] relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-2 rainbow-bar" />
+        <div className="flex flex-col items-center text-center">
+          <div className="text-6xl unicorn-float mb-2" aria-hidden>🦄</div>
+          <h1 className="text-3xl font-bold unicorn-text">Unicorn Grades</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your department password unlocks grading. Admin password opens the admin panel.
+            Sparkle in your department password — Admin sees everything 🌈
           </p>
         </div>
 
