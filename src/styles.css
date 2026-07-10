@@ -162,3 +162,24 @@
   background-clip: text;
   color: transparent;
 }
+
+@utility rainbow-bar {
+  background-image: linear-gradient(
+    90deg,
+    #ff5f6d 0%,
+    #ffb86c 20%,
+    #f9f871 40%,
+    #7bed9f 60%,
+    #70a1ff 80%,
+    #c56cf0 100%
+  );
+}
+
+@keyframes sparkle-float {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-8px) rotate(6deg); }
+}
+
+@utility unicorn-float {
+  animation: sparkle-float 4s ease-in-out infinite;
+}
