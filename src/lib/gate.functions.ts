@@ -25,12 +25,12 @@ export const unlock = createServerFn({ method: "POST" })
       findMatchingDepts,
     } = await import("./session.server");
 
-    if (isAdminPassword(data.password)) {
+    if (await isAdminPassword(data.password)) {
       const s = await getSession();
       await s.update({ role: "admin", deptSlug: undefined, deptName: undefined });
       return { ok: true as const, role: "admin" as const };
     }
-    const matches = findMatchingDepts(data.password);
+    const matches = await findMatchingDepts(data.password);
     if (matches.length === 0) return { ok: false as const };
 
     let chosen = matches[0];
