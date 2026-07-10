@@ -88,3 +88,40 @@ export const adminListAllPeople = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
+
+// Totals per person (sum of all grade fields incl. hod_grade). Admin: all people. Dept: own dept.
+export const listTotals = createServerFn({ method: "GET" })
+  .inputValidator((d: unknown) => z.object({}).parse(d ?? {}))
+  .handler(async () => {
+    const { requireAny } = await import("./session.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const s = await requireAny();
+
+    let personQuery = supabaseAdmin.from("people").select("id,department_slug");
+    if (s.role === "dept") personQuery = personQuery.eq("department_slug", s.deptSlug!);
+    const { data: people, error: pe } = await personQuery;
+    if (pe) throw new Error(pe.message);
+    const ids = (people ?? []).map((p) => p.id);
+    if (ids.length === 0) return {} as Record<string, number>;
+
+    const { data: grades, error: ge } = await supabaseAdmin
+      .from("grades")
+      .select("person_id,dept_task_grade,da_task_grade,mkt_task_grade,hr_task_grade,ethics_grade,other_grade,hod_grade")
+      .in("person_id", ids);
+    if (ge) throw new Error(ge.message);
+
+    const totals: Record<string, number> = {};
+    for (const id of ids) totals[id] = 0;
+    for (const g of grades ?? []) {
+      const sum =
+        (Number(g.dept_task_grade) || 0) +
+        (Number(g.da_task_grade) || 0) +
+        (Number(g.mkt_task_grade) || 0) +
+        (Number(g.hr_task_grade) || 0) +
+        (Number(g.ethics_grade) || 0) +
+        (Number(g.other_grade) || 0) +
+        (Number(g.hod_grade) || 0);
+      totals[g.person_id] = (totals[g.person_id] ?? 0) + sum;
+    }
+    return totals;
+  });
