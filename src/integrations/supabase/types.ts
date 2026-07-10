@@ -35,6 +35,24 @@ export type Database = {
         }
         Relationships: []
       }
+      dept_credentials: {
+        Row: {
+          password: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          password: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          password?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       grades: {
         Row: {
           created_at: string
