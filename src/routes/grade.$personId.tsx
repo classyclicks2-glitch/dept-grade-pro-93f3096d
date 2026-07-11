@@ -98,8 +98,9 @@ function GradePage() {
       await qc.invalidateQueries({ queryKey: ["grade", person.id, date] });
       await qc.invalidateQueries({ queryKey: ["totals"] });
       await qc.invalidateQueries({ queryKey: ["admin", "totals"] });
-      await refetch();
-      setMsg(`Mark added · today's total ${dayTotal.toFixed(1)}`);
+      const savedTotal = dayTotal;
+      setMsg(`Mark added · today's total ${savedTotal.toFixed(1)}`);
+      router.navigate({ to: "/dashboard" });
     } catch (e) {
       setMsg((e as Error).message);
     } finally {
