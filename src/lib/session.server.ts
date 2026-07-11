@@ -2,13 +2,16 @@
 import { useSession } from "@tanstack/react-start/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 
-export const DEPARTMENTS: { slug: string; name: string; env: string }[] = [
-  { slug: "delegate_affairs", name: "Delegate Affairs", env: "SITE_PW_delegate_affairs" },
-  { slug: "marketing", name: "Marketing", env: "SITE_PW_marketing" },
-  { slug: "hr", name: "HR", env: "SITE_PW_hr" },
-  { slug: "academics", name: "Academics", env: "SITE_PW_academics" },
-  { slug: "corporate_affairs", name: "Corporate Affairs", env: "SITE_PW_corporate_affairs" },
+export const DEPARTMENTS: { slug: string; name: string; password: string }[] = [
+  { slug: "delegate_affairs", name: "Delegate Affairs", password: "2222" },
+  { slug: "marketing", name: "Marketing", password: "1111" },
+  { slug: "hr", name: "HR", password: "0000" },
+  { slug: "academics", name: "Academics", password: "3333" },
+  { slug: "corporate_affairs", name: "Corporate Affairs", password: "4444" },
 ];
+
+const ADMIN_PW_FALLBACK = "admin";
+
 
 export type GateSession = {
   role?: "admin" | "dept";
@@ -44,39 +47,24 @@ export function passwordMatches(input: string, expected: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-async function getStoredPassword(slug: string): Promise<string | null> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin
-    .from("dept_credentials")
-    .select("password")
-    .eq("slug", slug)
-    .maybeSingle();
-  return data?.password ?? null;
-}
-
 export async function currentDeptPassword(slug: string): Promise<string> {
-  const stored = await getStoredPassword(slug);
-  if (stored) return stored;
-  const dept = DEPARTMENTS.find((d) => d.slug === slug);
-  return (dept && process.env[dept.env]) || "";
+  return DEPARTMENTS.find((d) => d.slug === slug)?.password ?? "";
 }
 
 export async function currentAdminPassword(): Promise<string> {
-  const stored = await getStoredPassword("admin");
-  if (stored) return stored;
-  return process.env.ADMIN_PASSWORD ?? "";
+  return process.env.ADMIN_PASSWORD ?? ADMIN_PW_FALLBACK;
 }
 
 export async function findMatchingDepts(password: string) {
   const results: { slug: string; name: string }[] = [];
   for (const d of DEPARTMENTS) {
-    const expected = await currentDeptPassword(d.slug);
-    if (expected && passwordMatches(password, expected)) {
+    if (passwordMatches(password, d.password)) {
       results.push({ slug: d.slug, name: d.name });
     }
   }
   return results;
 }
+
 
 export async function isAdminPassword(password: string): Promise<boolean> {
   const expected = await currentAdminPassword();
