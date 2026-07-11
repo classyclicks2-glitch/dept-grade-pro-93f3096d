@@ -52,8 +52,9 @@ export async function currentDeptPassword(slug: string): Promise<string> {
 }
 
 export async function currentAdminPassword(): Promise<string> {
-  return process.env.ADMIN_PASSWORD ?? ADMIN_PW_FALLBACK;
+  return ADMIN_PW_FALLBACK;
 }
+
 
 export async function findMatchingDepts(password: string) {
   const results: { slug: string; name: string }[] = [];
