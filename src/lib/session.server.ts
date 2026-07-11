@@ -10,7 +10,7 @@ export const DEPARTMENTS: { slug: string; name: string; password: string }[] = [
   { slug: "corporate_affairs", name: "Corporate Affairs", password: "4444" },
 ];
 
-const ADMIN_PW_FALLBACK = "admin";
+const ADMIN_PW_FALLBACK = "0007";
 
 
 export type GateSession = {
@@ -52,8 +52,9 @@ export async function currentDeptPassword(slug: string): Promise<string> {
 }
 
 export async function currentAdminPassword(): Promise<string> {
-  return process.env.ADMIN_PASSWORD ?? ADMIN_PW_FALLBACK;
+  return ADMIN_PW_FALLBACK;
 }
+
 
 export async function findMatchingDepts(password: string) {
   const results: { slug: string; name: string }[] = [];
