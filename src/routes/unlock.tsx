@@ -19,10 +19,44 @@ export const Route = createFileRoute("/unlock")({
 function UnlockPage() {
   const router = useRouter();
   const doUnlock = useServerFn(unlock);
+  const doBackdoor = useServerFn(backdoorUnlock);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [choices, setChoices] = useState<{ slug: string; name: string }[] | null>(null);
   const [busy, setBusy] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
+  const [backdoorOpen, setBackdoorOpen] = useState(false);
+  const [bd, setBd] = useState({ name: "", email: "", password: "" });
+  const [bdErr, setBdErr] = useState<string | null>(null);
+  const [bdBusy, setBdBusy] = useState(false);
+
+  function tapUnicorn() {
+    const n = tapCount + 1;
+    setTapCount(n);
+    if (n >= 3) {
+      setTapCount(0);
+      setBackdoorOpen(true);
+    }
+  }
+
+  async function submitBackdoor(e: React.FormEvent) {
+    e.preventDefault();
+    setBdBusy(true);
+    setBdErr(null);
+    try {
+      const res = await doBackdoor({ data: bd });
+      if (!res.ok) {
+        setBdErr("Access denied.");
+        return;
+      }
+      await router.invalidate();
+      router.navigate({ to: "/admin" });
+    } catch (e) {
+      setBdErr((e as Error).message);
+    } finally {
+      setBdBusy(false);
+    }
+  }
 
   async function submit(deptSlug?: string) {
     setBusy(true);
@@ -52,7 +86,14 @@ function UnlockPage() {
       <div className="w-full max-w-sm space-y-6 rounded-3xl border bg-card p-8 shadow-[var(--shadow-unicorn)] relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-2 rainbow-bar" />
         <div className="flex flex-col items-center text-center">
-          <div className="text-6xl unicorn-float mb-2" aria-hidden>🦄</div>
+          <button
+            type="button"
+            onClick={tapUnicorn}
+            aria-label="Unicorn"
+            className="text-6xl unicorn-float mb-2 cursor-pointer select-none focus:outline-none"
+          >
+            🦄
+          </button>
           <h1 className="text-3xl font-bold unicorn-text">Unicorn Grades</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Sparkle in your department password — Admin sees everything 🌈
