@@ -17,6 +17,7 @@ import { Route as StatusPersonIdRouteImport } from './routes/status.$personId'
 import { Route as PeopleNewRouteImport } from './routes/people.new'
 import { Route as GradePersonIdRouteImport } from './routes/grade.$personId'
 import { Route as AdminVaultRouteImport } from './routes/admin.vault'
+import { Route as AdminRankingRouteImport } from './routes/admin.ranking'
 import { Route as AdminPersonPersonIdRouteImport } from './routes/admin.person.$personId'
 
 const UnlockRoute = UnlockRouteImport.update({
@@ -59,6 +60,11 @@ const AdminVaultRoute = AdminVaultRouteImport.update({
   path: '/admin/vault',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRankingRoute = AdminRankingRouteImport.update({
+  id: '/admin/ranking',
+  path: '/admin/ranking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPersonPersonIdRoute = AdminPersonPersonIdRouteImport.update({
   id: '/admin/person/$personId',
   path: '/admin/person/$personId',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/admin/ranking': typeof AdminRankingRoute
   '/admin/vault': typeof AdminVaultRoute
   '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/admin/ranking': typeof AdminRankingRoute
   '/admin/vault': typeof AdminVaultRoute
   '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/unlock': typeof UnlockRoute
+  '/admin/ranking': typeof AdminRankingRoute
   '/admin/vault': typeof AdminVaultRoute
   '/grade/$personId': typeof GradePersonIdRoute
   '/people/new': typeof PeopleNewRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/unlock'
+    | '/admin/ranking'
     | '/admin/vault'
     | '/grade/$personId'
     | '/people/new'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/unlock'
+    | '/admin/ranking'
     | '/admin/vault'
     | '/grade/$personId'
     | '/people/new'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/unlock'
+    | '/admin/ranking'
     | '/admin/vault'
     | '/grade/$personId'
     | '/people/new'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   UnlockRoute: typeof UnlockRoute
+  AdminRankingRoute: typeof AdminRankingRoute
   AdminVaultRoute: typeof AdminVaultRoute
   GradePersonIdRoute: typeof GradePersonIdRoute
   PeopleNewRoute: typeof PeopleNewRoute
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminVaultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/ranking': {
+      id: '/admin/ranking'
+      path: '/admin/ranking'
+      fullPath: '/admin/ranking'
+      preLoaderRoute: typeof AdminRankingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/person/$personId': {
       id: '/admin/person/$personId'
       path: '/admin/person/$personId'
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   UnlockRoute: UnlockRoute,
+  AdminRankingRoute: AdminRankingRoute,
   AdminVaultRoute: AdminVaultRoute,
   GradePersonIdRoute: GradePersonIdRoute,
   PeopleNewRoute: PeopleNewRoute,

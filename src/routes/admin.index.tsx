@@ -52,9 +52,14 @@ function AdminHome() {
         title="Admin"
         subtitle="All departments"
         right={
-          <Button asChild variant="outline" size="sm">
-            <Link to="/admin/vault">Vault</Link>
-          </Button>
+          <>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/ranking">Ranking</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/vault">Vault</Link>
+            </Button>
+          </>
         }
       />
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
