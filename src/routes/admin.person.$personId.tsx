@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
-import { getPerson } from "@/lib/people.functions";
+import { getPerson, listTotals } from "@/lib/people.functions";
 import { listGrades, adminEditGrade } from "@/lib/grades.functions";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
