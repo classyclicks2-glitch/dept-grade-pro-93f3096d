@@ -105,69 +105,33 @@ function AdminHome() {
 }
 
 function PasswordManager() {
-  const qc = useQueryClient();
   const fetchCreds = useServerFn(listCredentials);
-  const save = useServerFn(setCredential);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "creds"],
     queryFn: () => fetchCreds({ data: {} }),
   });
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [busy, setBusy] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  async function update(slug: string) {
-    const password = drafts[slug];
-    if (!password) return;
-    setBusy(slug);
-    setMsg(null);
-    try {
-      await save({ data: { slug, password } });
-      await qc.invalidateQueries({ queryKey: ["admin", "creds"] });
-      setDrafts((d) => ({ ...d, [slug]: "" }));
-      setMsg(`Password updated for ${slug === "admin" ? "Admin" : slug}.`);
-    } catch (e) {
-      setMsg((e as Error).message);
-    } finally {
-      setBusy(null);
-    }
-  }
 
   return (
     <section className="rounded-2xl border bg-card p-4 shadow-sm">
       <h2 className="text-lg font-semibold unicorn-text">🦄 Department passwords 🌈</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Change any department password. Includes the Admin password.
+        These are fixed in code. Ask the developer to change them.
       </p>
       {isLoading && <p className="mt-3 text-sm text-muted-foreground">Loading…</p>}
       {data && (
-        <div className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-2">
           {[
             ...data.depts.map((d) => ({ slug: d.slug, name: d.name, current: d.password })),
             { slug: "admin", name: "Admin", current: data.admin },
           ].map((row) => (
-            <div key={row.slug} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] items-center">
-              <div>
-                <p className="font-medium">{row.name}</p>
-                <p className="text-xs text-muted-foreground">Current: {row.current || "—"}</p>
-              </div>
-              <Input
-                placeholder="New password"
-                value={drafts[row.slug] ?? ""}
-                onChange={(e) => setDrafts((d) => ({ ...d, [row.slug]: e.target.value }))}
-              />
-              <Button
-                size="sm"
-                disabled={!drafts[row.slug] || busy === row.slug}
-                onClick={() => update(row.slug)}
-              >
-                {busy === row.slug ? "Saving…" : "Save"}
-              </Button>
-            </div>
+            <li key={row.slug} className="flex items-center justify-between rounded-lg border bg-background/50 px-3 py-2">
+              <span className="font-medium">{row.name}</span>
+              <code className="text-sm">{row.current || "—"}</code>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-      {msg && <p className="mt-3 text-sm font-medium text-primary">{msg}</p>}
     </section>
   );
 }
+
