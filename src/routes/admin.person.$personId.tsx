@@ -68,6 +68,7 @@ function AdminPerson() {
   const { person } = Route.useLoaderData();
   const qc = useQueryClient();
   const fetchGrades = useServerFn(listGrades);
+  const fetchTotals = useServerFn(listTotals);
   const editFn = useServerFn(adminEditGrade);
 
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
@@ -76,6 +77,11 @@ function AdminPerson() {
     queryKey: ["admin", "grades", person.id, from, to],
     queryFn: () => fetchGrades({ data: { personId: person.id, from, to } }),
   });
+  const { data: totals = {} } = useQuery({
+    queryKey: ["admin", "totals"],
+    queryFn: () => fetchTotals({ data: {} }),
+  });
+  const allTime = (totals as Record<string, number>)[person.id] ?? 0;
 
   const byDate = new Map<string, any>();
   for (const g of grades) byDate.set(g.date, g);
@@ -87,7 +93,7 @@ function AdminPerson() {
     <div className="min-h-screen bg-background">
       <AppHeader
         title={person.name}
-        subtitle={`${person.department_slug} · overall grade ${overall}`}
+        subtitle={`${person.department_slug} · ${month} total ${overall}`}
         right={
           <Button asChild variant="outline" size="sm">
             <Link to="/admin">Back</Link>
@@ -95,6 +101,10 @@ function AdminPerson() {
         }
       />
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-4">
+        <div className="rounded-2xl unicorn-gradient p-6 text-white shadow-[var(--shadow-unicorn)]">
+          <p className="text-sm opacity-90">All-time total marks (incl. HOD)</p>
+          <p className="mt-2 text-5xl font-bold">{allTime.toFixed(1)}</p>
+        </div>
         <div className="flex items-center gap-3">
           <Label>Month</Label>
           <Input
