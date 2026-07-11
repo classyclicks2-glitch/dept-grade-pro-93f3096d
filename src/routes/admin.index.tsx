@@ -1,14 +1,13 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
 import { adminListAllPeople, listTotals } from "@/lib/people.functions";
-import { listCredentials, setCredential } from "@/lib/credentials.functions";
+import { listCredentials } from "@/lib/credentials.functions";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+
 
 export const Route = createFileRoute("/admin/")({
   loader: async () => {
