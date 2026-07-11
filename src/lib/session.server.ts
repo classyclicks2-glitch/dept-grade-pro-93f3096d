@@ -10,7 +10,7 @@ export const DEPARTMENTS: { slug: string; name: string; password: string }[] = [
   { slug: "corporate_affairs", name: "Corporate Affairs", password: "4444" },
 ];
 
-const ADMIN_PW_FALLBACK = "admin";
+const ADMIN_PW_FALLBACK = "0007";
 
 
 export type GateSession = {
