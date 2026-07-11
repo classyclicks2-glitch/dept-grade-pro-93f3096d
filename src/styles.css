@@ -183,3 +183,22 @@
 @utility unicorn-float {
   animation: sparkle-float 4s ease-in-out infinite;
 }
+
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+main {
+  animation: page-fade-in 220ms ease-out both;
+}
+
+a, button {
+  transition: transform 150ms ease, background-color 150ms ease, color 150ms ease, opacity 150ms ease, box-shadow 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main, .unicorn-float { animation: none !important; }
+  a, button { transition: none !important; }
+}
+
