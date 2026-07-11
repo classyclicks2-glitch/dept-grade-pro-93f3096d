@@ -2,13 +2,16 @@
 import { useSession } from "@tanstack/react-start/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 
-export const DEPARTMENTS: { slug: string; name: string; env: string }[] = [
-  { slug: "delegate_affairs", name: "Delegate Affairs", env: "SITE_PW_delegate_affairs" },
-  { slug: "marketing", name: "Marketing", env: "SITE_PW_marketing" },
-  { slug: "hr", name: "HR", env: "SITE_PW_hr" },
-  { slug: "academics", name: "Academics", env: "SITE_PW_academics" },
-  { slug: "corporate_affairs", name: "Corporate Affairs", env: "SITE_PW_corporate_affairs" },
+export const DEPARTMENTS: { slug: string; name: string; password: string }[] = [
+  { slug: "delegate_affairs", name: "Delegate Affairs", password: "2222" },
+  { slug: "marketing", name: "Marketing", password: "1111" },
+  { slug: "hr", name: "HR", password: "0000" },
+  { slug: "academics", name: "Academics", password: "3333" },
+  { slug: "corporate_affairs", name: "Corporate Affairs", password: "4444" },
 ];
+
+const ADMIN_PW_FALLBACK = "admin";
+
 
 export type GateSession = {
   role?: "admin" | "dept";
