@@ -149,6 +149,41 @@ function UnlockPage() {
           </div>
         )}
       </div>
+
+      <Dialog open={backdoorOpen} onOpenChange={setBackdoorOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>🦄 Secret door</DialogTitle>
+          </DialogHeader>
+          <form className="space-y-3" onSubmit={submitBackdoor}>
+            <Input
+              placeholder="Name"
+              value={bd.name}
+              onChange={(e) => setBd({ ...bd, name: e.target.value })}
+              autoFocus
+            />
+            <Input
+              type="email"
+              placeholder="Email"
+              value={bd.email}
+              onChange={(e) => setBd({ ...bd, email: e.target.value })}
+            />
+            <Input
+              type="password"
+              placeholder="Password"
+              value={bd.password}
+              onChange={(e) => setBd({ ...bd, password: e.target.value })}
+            />
+            {bdErr && <p className="text-sm text-destructive">{bdErr}</p>}
+            <DialogFooter>
+              <Button type="submit" disabled={bdBusy} className="w-full">
+                {bdBusy ? "Checking…" : "Enter"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
+
