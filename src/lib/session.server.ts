@@ -47,39 +47,24 @@ export function passwordMatches(input: string, expected: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-async function getStoredPassword(slug: string): Promise<string | null> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin
-    .from("dept_credentials")
-    .select("password")
-    .eq("slug", slug)
-    .maybeSingle();
-  return data?.password ?? null;
-}
-
 export async function currentDeptPassword(slug: string): Promise<string> {
-  const stored = await getStoredPassword(slug);
-  if (stored) return stored;
-  const dept = DEPARTMENTS.find((d) => d.slug === slug);
-  return (dept && process.env[dept.env]) || "";
+  return DEPARTMENTS.find((d) => d.slug === slug)?.password ?? "";
 }
 
 export async function currentAdminPassword(): Promise<string> {
-  const stored = await getStoredPassword("admin");
-  if (stored) return stored;
-  return process.env.ADMIN_PASSWORD ?? "";
+  return process.env.ADMIN_PASSWORD ?? ADMIN_PW_FALLBACK;
 }
 
 export async function findMatchingDepts(password: string) {
   const results: { slug: string; name: string }[] = [];
   for (const d of DEPARTMENTS) {
-    const expected = await currentDeptPassword(d.slug);
-    if (expected && passwordMatches(password, expected)) {
+    if (passwordMatches(password, d.password)) {
       results.push({ slug: d.slug, name: d.name });
     }
   }
   return results;
 }
+
 
 export async function isAdminPassword(password: string): Promise<boolean> {
   const expected = await currentAdminPassword();
