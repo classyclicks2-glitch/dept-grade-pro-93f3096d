@@ -56,6 +56,9 @@ function AdminHome() {
               <Link to="/admin/ranking">Ranking</Link>
             </Button>
             <Button asChild variant="outline" size="sm">
+              <Link to="/admin/updates">Updates</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
               <Link to="/admin/vault">Vault</Link>
             </Button>
           </>

@@ -1,11 +1,16 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
 import { listPeople, listTotals } from "@/lib/people.functions";
+import { listUpdates, addUpdate, deleteUpdate } from "@/lib/updates.functions";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
   loader: async () => {
@@ -91,8 +96,103 @@ function Dashboard() {
             ))}
           </ul>
         )}
+
+        <DepartmentalUpdates deptSlug={s.deptSlug!} />
       </main>
     </div>
+  );
+}
+
+function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
+  const qc = useQueryClient();
+  const fetchUpdates = useServerFn(listUpdates);
+  const addFn = useServerFn(addUpdate);
+  const delFn = useServerFn(deleteUpdate);
+  const [author, setAuthor] = useState("");
+  const [content, setContent] = useState("");
+
+  const { data: updates = [], isLoading } = useQuery({
+    queryKey: ["updates", deptSlug],
+    queryFn: () => fetchUpdates({ data: {} }),
+  });
+
+  const add = useMutation({
+    mutationFn: (vars: { author_name: string; content: string }) => addFn({ data: vars }),
+    onSuccess: () => {
+      setContent("");
+      qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
+      toast.success("Update posted");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: (id: string) => delFn({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["updates", deptSlug] }),
+  });
+
+  return (
+    <section className="rounded-2xl border bg-card p-4 shadow-sm">
+      <h2 className="text-lg font-semibold unicorn-text">📝 Departmental updates</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Post what your team did today. Admin can see all departments' updates.
+      </p>
+
+      <form
+        className="mt-4 space-y-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!author.trim() || !content.trim()) return;
+          add.mutate({ author_name: author.trim(), content: content.trim() });
+        }}
+      >
+        <Input
+          placeholder="Your name"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          maxLength={120}
+          required
+        />
+        <Textarea
+          placeholder="Today's update…"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          maxLength={2000}
+          rows={3}
+          required
+        />
+        <Button type="submit" size="sm" disabled={add.isPending}>
+          {add.isPending ? "Posting…" : "Post update"}
+        </Button>
+      </form>
+
+      <div className="mt-5 space-y-3">
+        {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+        {!isLoading && updates.length === 0 && (
+          <p className="text-sm text-muted-foreground">No updates yet.</p>
+        )}
+        {updates.map((u) => (
+          <div key={u.id} className="rounded-lg border bg-background/50 p-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">{u.author_name}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  {new Date(u.created_at).toLocaleString()}
+                </p>
+                <button
+                  onClick={() => del.mutate(u.id)}
+                  className="text-xs text-muted-foreground hover:text-destructive"
+                  aria-label="Delete"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <p className="mt-1 whitespace-pre-wrap text-sm">{u.content}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
