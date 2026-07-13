@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      dept_updates: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          department_slug: string
+          id: string
+          update_date: string
+          updated_at: string
+        }
+        Insert: {
+          author_name: string
+          content: string
+          created_at?: string
+          department_slug: string
+          id?: string
+          update_date?: string
+          updated_at?: string
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          department_slug?: string
+          id?: string
+          update_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       grades: {
         Row: {
           created_at: string
