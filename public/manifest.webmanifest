@@ -1,0 +1,25 @@
+{
+  "name": "Unicorn Grading",
+  "short_name": "Unicorn",
+  "description": "Departmental grading, attendance and daily updates.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b12",
+  "theme_color": "#ff5fb3",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
