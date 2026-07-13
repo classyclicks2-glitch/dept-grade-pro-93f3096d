@@ -115,6 +115,7 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   const delFn = useServerFn(deleteUpdate);
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
+  const [date, setDate] = useState<Date>(new Date());
 
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["updates", deptSlug],
@@ -122,7 +123,8 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   });
 
   const add = useMutation({
-    mutationFn: (vars: { author_name: string; content: string }) => addFn({ data: vars }),
+    mutationFn: (vars: { author_name: string; content: string; update_date?: string }) =>
+      addFn({ data: vars }),
     onSuccess: () => {
       setContent("");
       qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
@@ -140,7 +142,7 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
     <section className="rounded-2xl border bg-card p-4 shadow-sm">
       <h2 className="text-lg font-semibold unicorn-text">📝 Departmental updates</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Post what your team did today. Admin can see all departments' updates.
+        Post what your team did. Pick the date it applies to. Admin can see all departments' updates.
       </p>
 
       <form
@@ -148,18 +150,46 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
         onSubmit={(e) => {
           e.preventDefault();
           if (!author.trim() || !content.trim()) return;
-          add.mutate({ author_name: author.trim(), content: content.trim() });
+          add.mutate({
+            author_name: author.trim(),
+            content: content.trim(),
+            update_date: format(date, "yyyy-MM-dd"),
+          });
         }}
       >
-        <Input
-          placeholder="Your name"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          maxLength={120}
-          required
-        />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Input
+            placeholder="Your name"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            maxLength={120}
+            required
+            className="sm:flex-1"
+          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className={cn("sm:w-[200px] justify-start text-left font-normal")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(date, "PPP")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={(d) => d && setDate(d)}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
         <Textarea
-          placeholder="Today's update…"
+          placeholder="Update for the selected date…"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           maxLength={2000}
