@@ -68,9 +68,14 @@ function AdminUpdates() {
           {updates.map((u) => (
             <li key={u.id} className="rounded-2xl border bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between gap-3">
-                <p className="font-medium">{u.author_name}</p>
+                <div>
+                  <p className="font-medium">{u.author_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    For {new Date(u.update_date + "T00:00:00").toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}
+                  </p>
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(u.created_at).toLocaleString()}
+                  Posted {new Date(u.created_at).toLocaleString()}
                 </p>
               </div>
               <p className="mt-2 whitespace-pre-wrap text-sm">{u.content}</p>
