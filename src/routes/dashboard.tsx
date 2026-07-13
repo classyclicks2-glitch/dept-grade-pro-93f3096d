@@ -209,7 +209,12 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
         {updates.map((u) => (
           <div key={u.id} className="rounded-lg border bg-background/50 p-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium">{u.author_name}</p>
+              <div>
+                <p className="text-sm font-medium">{u.author_name}</p>
+                <p className="text-xs text-muted-foreground">
+                  For {format(new Date(u.update_date + "T00:00:00"), "PPP")}
+                </p>
+              </div>
               <div className="flex items-center gap-2">
                 <p className="text-xs text-muted-foreground">
                   {new Date(u.created_at).toLocaleString()}
