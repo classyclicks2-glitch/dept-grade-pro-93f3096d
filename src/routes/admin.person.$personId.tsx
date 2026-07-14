@@ -103,7 +103,7 @@ function AdminPerson() {
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-4">
         <div className="rounded-2xl unicorn-gradient p-6 text-white shadow-[var(--shadow-unicorn)]">
           <p className="text-sm opacity-90">All-time total marks (incl. HOD)</p>
-          <p className="mt-2 text-5xl font-bold">{allTime.toFixed(1)}</p>
+          <p className="mt-2 text-5xl font-bold">{allTime.toFixed(0)}</p>
         </div>
         <div className="flex items-center gap-3">
           <Label>Month</Label>

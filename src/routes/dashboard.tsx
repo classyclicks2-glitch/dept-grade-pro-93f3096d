@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
 import { listPeople, listTotals } from "@/lib/people.functions";
 import { listUpdates, addUpdate, deleteUpdate } from "@/lib/updates.functions";
@@ -16,6 +16,7 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { queueUpdate, getPending, flushQueue, type PendingUpdate } from "@/lib/offline-updates";
 
 export const Route = createFileRoute("/dashboard")({
   loader: async () => {
@@ -55,7 +56,7 @@ function Dashboard() {
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <div className="rounded-2xl unicorn-gradient p-6 text-white shadow-[var(--shadow-unicorn)]">
           <p className="text-sm/none opacity-90">Total marks of everyone</p>
-          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(1)}</p>
+          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(0)}</p>
           <p className="mt-1 text-xs opacity-80">{people.length} people · all-time sum</p>
         </div>
 
@@ -82,7 +83,7 @@ function Dashboard() {
                 <div className="mt-3 flex items-baseline gap-2">
                   <span className="text-xs text-muted-foreground">Total</span>
                   <span className="unicorn-text text-2xl font-bold">
-                    {(totals[p.id] ?? 0).toFixed(1)}
+                    {(totals[p.id] ?? 0).toFixed(0)}
                   </span>
                 </div>
                 <div className="mt-3 flex gap-2">
@@ -116,11 +117,36 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
   const [date, setDate] = useState<Date>(new Date());
+  const [pending, setPending] = useState<PendingUpdate[]>([]);
+  const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
 
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["updates", deptSlug],
     queryFn: () => fetchUpdates({ data: {} }),
   });
+
+  const refreshPending = () => setPending(getPending());
+
+  useEffect(() => {
+    refreshPending();
+    const flush = async () => {
+      const n = await flushQueue((u) => addFn({ data: u }));
+      refreshPending();
+      if (n > 0) {
+        qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
+        toast.success(`Synced ${n} offline update${n > 1 ? "s" : ""}`);
+      }
+    };
+    const onOnline = () => { setOnline(true); flush(); };
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    if (navigator.onLine) flush();
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [addFn, deptSlug, qc]);
 
   const add = useMutation({
     mutationFn: (vars: { author_name: string; content: string; update_date?: string }) =>
@@ -130,7 +156,12 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
       qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
       toast.success("Update posted");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error, vars) => {
+      queueUpdate(vars);
+      refreshPending();
+      setContent("");
+      toast.message("Saved offline — will sync when back online", { description: e.message });
+    },
   });
 
   const del = useMutation({
@@ -140,9 +171,17 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
 
   return (
     <section className="rounded-2xl border bg-card p-4 shadow-sm">
-      <h2 className="text-lg font-semibold unicorn-text">📝 Departmental updates</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold unicorn-text">📝 Departmental updates</h2>
+        <span className={cn(
+          "text-xs rounded-full px-2 py-0.5",
+          online ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
+        )}>
+          {online ? "Online" : "Offline"}
+        </span>
+      </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        Post what your team did. Pick the date it applies to. Admin can see all departments' updates.
+        Post what your team did. Works offline — it will sync automatically when you're back online.
       </p>
 
       <form
@@ -150,11 +189,19 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
         onSubmit={(e) => {
           e.preventDefault();
           if (!author.trim() || !content.trim()) return;
-          add.mutate({
+          const vars = {
             author_name: author.trim(),
             content: content.trim(),
             update_date: format(date, "yyyy-MM-dd"),
-          });
+          };
+          if (!navigator.onLine) {
+            queueUpdate(vars);
+            refreshPending();
+            setContent("");
+            toast.message("Saved offline — will sync when back online");
+            return;
+          }
+          add.mutate(vars);
         }}
       >
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -202,8 +249,21 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
       </form>
 
       <div className="mt-5 space-y-3">
+        {pending.length > 0 && (
+          <div className="rounded-lg border border-dashed border-amber-500/50 bg-amber-500/5 p-3">
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+              {pending.length} update{pending.length > 1 ? "s" : ""} waiting to sync
+            </p>
+            {pending.map((p) => (
+              <div key={p.id} className="mt-2">
+                <p className="text-sm font-medium">{p.author_name} · <span className="text-xs text-muted-foreground">{p.update_date}</span></p>
+                <p className="whitespace-pre-wrap text-sm">{p.content}</p>
+              </div>
+            ))}
+          </div>
+        )}
         {isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
-        {!isLoading && updates.length === 0 && (
+        {!isLoading && updates.length === 0 && pending.length === 0 && (
           <p className="text-sm text-muted-foreground">No updates yet.</p>
         )}
         {updates.map((u) => (
