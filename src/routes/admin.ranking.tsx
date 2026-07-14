@@ -71,7 +71,7 @@ function RankingPage() {
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">{p.status}</Badge>
                 <span className="unicorn-text text-xl font-bold tabular-nums">
-                  {p.total.toFixed(1)}
+                  {p.total.toFixed(0)}
                 </span>
               </div>
             </li>

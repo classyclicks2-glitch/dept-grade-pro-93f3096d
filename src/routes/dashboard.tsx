@@ -55,7 +55,7 @@ function Dashboard() {
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <div className="rounded-2xl unicorn-gradient p-6 text-white shadow-[var(--shadow-unicorn)]">
           <p className="text-sm/none opacity-90">Total marks of everyone</p>
-          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(1)}</p>
+          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(0)}</p>
           <p className="mt-1 text-xs opacity-80">{people.length} people · all-time sum</p>
         </div>
 
@@ -82,7 +82,7 @@ function Dashboard() {
                 <div className="mt-3 flex items-baseline gap-2">
                   <span className="text-xs text-muted-foreground">Total</span>
                   <span className="unicorn-text text-2xl font-bold">
-                    {(totals[p.id] ?? 0).toFixed(1)}
+                    {(totals[p.id] ?? 0).toFixed(0)}
                   </span>
                 </div>
                 <div className="mt-3 flex gap-2">

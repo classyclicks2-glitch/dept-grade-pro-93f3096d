@@ -99,7 +99,7 @@ function GradePage() {
       await qc.invalidateQueries({ queryKey: ["totals"] });
       await qc.invalidateQueries({ queryKey: ["admin", "totals"] });
       const savedTotal = dayTotal;
-      setMsg(`Mark added · today's total ${savedTotal.toFixed(1)}`);
+      setMsg(`Mark added · today's total ${savedTotal.toFixed(0)}`);
       router.navigate({ to: "/dashboard" });
     } catch (e) {
       setMsg((e as Error).message);
@@ -142,7 +142,7 @@ function GradePage() {
               <Label>Grade</Label>
               <Input
                 type="number"
-                step="0.1"
+                step="1"
                 value={form[`${t.key}_task_grade`] ?? ""}
                 onChange={(e) => set(`${t.key}_task_grade`, e.target.value)}
               />
@@ -175,7 +175,7 @@ function GradePage() {
               <Label>Negative mark</Label>
               <Input
                 type="number"
-                step="0.1"
+                step="1"
                 placeholder="e.g. -1"
                 value={form.ethics_grade ?? ""}
                 onChange={(e) => set("ethics_grade", e.target.value)}
@@ -200,7 +200,7 @@ function GradePage() {
             <Label>Grade</Label>
             <Input
               type="number"
-              step="0.1"
+              step="1"
               value={form.other_grade ?? ""}
               onChange={(e) => set("other_grade", e.target.value)}
             />
@@ -209,7 +209,7 @@ function GradePage() {
 
         <div className="rounded-2xl unicorn-gradient p-4 text-white shadow-[var(--shadow-unicorn)] flex items-center justify-between">
           <span className="text-sm opacity-90">Total for {date}</span>
-          <span className="text-2xl font-bold">{dayTotal.toFixed(1)}</span>
+          <span className="text-2xl font-bold">{dayTotal.toFixed(0)}</span>
         </div>
         {msg && <p className="text-sm font-medium text-primary">{msg}</p>}
         <div className="flex gap-2">

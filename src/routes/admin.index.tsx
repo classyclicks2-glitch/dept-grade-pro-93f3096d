@@ -67,7 +67,7 @@ function AdminHome() {
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <div className="rounded-2xl unicorn-gradient p-6 text-white shadow-[var(--shadow-unicorn)]">
           <p className="text-sm opacity-90">Total marks of everyone (incl. HOD grade)</p>
-          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(1)}</p>
+          <p className="mt-2 text-5xl font-bold">{grandTotal.toFixed(0)}</p>
           <p className="mt-1 text-xs opacity-80">{people.length} people · all-time sum</p>
         </div>
 
@@ -90,7 +90,7 @@ function AdminHome() {
                       {p.role && <p className="text-xs text-muted-foreground">{p.role}</p>}
                       <p className="mt-1 text-sm">
                         <span className="text-muted-foreground">Total: </span>
-                        <span className="unicorn-text font-bold">{(totals[p.id] ?? 0).toFixed(1)}</span>
+                        <span className="unicorn-text font-bold">{(totals[p.id] ?? 0).toFixed(0)}</span>
                       </p>
                     </div>
                     <Badge variant={p.status === "active" ? "default" : "secondary"}>{p.status}</Badge>
