@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
 import { listPeople, listTotals } from "@/lib/people.functions";
 import { listUpdates, addUpdate, deleteUpdate } from "@/lib/updates.functions";
@@ -16,6 +16,7 @@ import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { queueUpdate, getPending, flushQueue, type PendingUpdate } from "@/lib/offline-updates";
 
 export const Route = createFileRoute("/dashboard")({
   loader: async () => {
