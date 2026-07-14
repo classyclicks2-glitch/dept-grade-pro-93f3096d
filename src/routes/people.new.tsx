@@ -1,4 +1,5 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/people/new")({
 function NewPerson() {
   const s = Route.useLoaderData();
   const router = useRouter();
+  const qc = useQueryClient();
   const create = useServerFn(addPerson);
   const [form, setForm] = useState({ name: "", role: "", instagram: "", email: "", phone: "" });
   const [busy, setBusy] = useState(false);
@@ -37,6 +39,8 @@ function NewPerson() {
             setError(null);
             try {
               await create({ data: form });
+              await qc.invalidateQueries({ queryKey: ["people", s.deptSlug] });
+              await qc.invalidateQueries({ queryKey: ["totals", s.deptSlug] });
               router.navigate({ to: "/dashboard" });
             } catch (err) {
               setError((err as Error).message);

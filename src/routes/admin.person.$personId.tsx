@@ -251,7 +251,7 @@ function EditDialog({
               />
               <Input
                 type="number"
-                step="0.1"
+                step="1"
                 placeholder="grade"
                 value={f[`${prefix}_task_grade`] ?? ""}
                 onChange={(e) => set(`${prefix}_task_grade`, e.target.value)}
@@ -272,7 +272,7 @@ function EditDialog({
             </Select>
             <Input
               type="number"
-              step="0.1"
+              step="1"
               placeholder="ethics grade"
               value={f.ethics_grade ?? ""}
               onChange={(e) => set("ethics_grade", e.target.value)}
@@ -293,7 +293,7 @@ function EditDialog({
             />
             <Input
               type="number"
-              step="0.1"
+              step="1"
               placeholder="other grade"
               value={f.other_grade ?? ""}
               onChange={(e) => set("other_grade", e.target.value)}
@@ -308,7 +308,7 @@ function EditDialog({
             />
             <Input
               type="number"
-              step="0.1"
+              step="1"
               placeholder="HOD grade"
               value={f.hod_grade ?? ""}
               onChange={(e) => set("hod_grade", e.target.value)}

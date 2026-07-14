@@ -225,5 +225,5 @@ function GradePage() {
 function numOrNull(v: any): number | null {
   if (v === "" || v === null || v === undefined) return null;
   const n = Number(v);
-  return Number.isFinite(n) ? n : null;
+  return Number.isFinite(n) ? Math.round(n) : null;
 }
