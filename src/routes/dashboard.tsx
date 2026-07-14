@@ -125,6 +125,8 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["updates", deptSlug],
     queryFn: () => fetchUpdates({ data: {} }),
+    refetchInterval: online ? 10000 : false,
+    refetchOnWindowFocus: true,
   });
 
   const refreshPending = () => setPending(getPending());

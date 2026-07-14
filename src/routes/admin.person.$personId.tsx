@@ -192,7 +192,7 @@ function EditDialog({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const set = (k: string, v: any) => setF((x: any) => ({ ...x, [k]: v }));
-  const num = (v: any) => (v === "" || v == null ? null : Number(v));
+  const num = (v: any) => (v === "" || v == null ? null : Math.round(Number(v)));
 
   async function submit() {
     setBusy(true);
