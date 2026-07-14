@@ -30,6 +30,8 @@ function AdminUpdates() {
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["admin", "updates", active],
     queryFn: () => fetchUpdates({ data: { deptSlug: active, limit: 200 } }),
+    refetchInterval: 10000,
+    refetchOnWindowFocus: true,
   });
 
   return (

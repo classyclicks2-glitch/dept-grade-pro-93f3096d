@@ -2,25 +2,25 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const dateStr = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
-const numOrNull = z.union([z.number(), z.null()]).optional();
+const wholeNumberOrNull = z.union([z.number().finite().transform((n) => Math.round(n)), z.null()]).optional();
 const strOrNull = z.union([z.string(), z.null()]).optional();
 
 const saveInput = z.object({
   personId: z.string().uuid(),
   date: dateStr,
   dept_task_detail: strOrNull,
-  dept_task_grade: numOrNull,
+  dept_task_grade: wholeNumberOrNull,
   da_task_detail: strOrNull,
-  da_task_grade: numOrNull,
+  da_task_grade: wholeNumberOrNull,
   mkt_task_detail: strOrNull,
-  mkt_task_grade: numOrNull,
+  mkt_task_grade: wholeNumberOrNull,
   hr_task_detail: strOrNull,
-  hr_task_grade: numOrNull,
+  hr_task_grade: wholeNumberOrNull,
   ethics: z.enum(["good", "bad", "na"]).optional(),
-  ethics_grade: numOrNull,
+  ethics_grade: wholeNumberOrNull,
   ethics_comment: strOrNull,
   other_remarks: strOrNull,
-  other_grade: numOrNull,
+  other_grade: wholeNumberOrNull,
 });
 
 export const getGrade = createServerFn({ method: "GET" })
@@ -103,7 +103,7 @@ export const saveGrade = createServerFn({ method: "POST" })
 // admin-only: edit any field including HOD
 const adminEditInput = saveInput.extend({
   hod_remarks: strOrNull,
-  hod_grade: numOrNull,
+  hod_grade: wholeNumberOrNull,
 });
 export const adminEditGrade = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => adminEditInput.parse(d))

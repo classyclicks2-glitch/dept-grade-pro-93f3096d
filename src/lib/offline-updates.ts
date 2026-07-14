@@ -1,6 +1,5 @@
-// Simple localStorage-backed queue for departmental updates.
-// Posts go directly when online; when offline or if the request fails,
-// they're queued and flushed automatically once the network is back.
+// Simple localStorage-backed drafts for departmental updates.
+// Offline posts stay on the device, then sync once the app is online again.
 
 const KEY = "pending_updates_v1";
 
@@ -46,18 +45,20 @@ export function removePending(id: string) {
 
 export async function flushQueue(
   send: (u: Omit<PendingUpdate, "id" | "queuedAt">) => Promise<unknown>,
-): Promise<number> {
+): Promise<{ synced: number; failed: number }> {
   const items = read();
-  let ok = 0;
+  let synced = 0;
+  let failed = 0;
   for (const it of items) {
     try {
       await send({ author_name: it.author_name, content: it.content, update_date: it.update_date });
       removePending(it.id);
-      ok++;
+      synced++;
     } catch {
-      // stop on first failure — try again next time
+      failed++;
+      // stop on first failure — keep remaining drafts and try again next time
       break;
     }
   }
-  return ok;
+  return { synced, failed };
 }

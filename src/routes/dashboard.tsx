@@ -1,7 +1,7 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSessionInfo } from "@/lib/gate.functions";
 import { listPeople, listTotals } from "@/lib/people.functions";
 import { listUpdates, addUpdate, deleteUpdate } from "@/lib/updates.functions";
@@ -119,10 +119,14 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   const [date, setDate] = useState<Date>(new Date());
   const [pending, setPending] = useState<PendingUpdate[]>([]);
   const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
+  const [syncing, setSyncing] = useState(false);
+  const syncRef = useRef(false);
 
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["updates", deptSlug],
     queryFn: () => fetchUpdates({ data: {} }),
+    refetchInterval: online ? 10000 : false,
+    refetchOnWindowFocus: true,
   });
 
   const refreshPending = () => setPending(getPending());
@@ -130,11 +134,19 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   useEffect(() => {
     refreshPending();
     const flush = async () => {
-      const n = await flushQueue((u) => addFn({ data: u }));
+      if (!navigator.onLine || syncRef.current) return;
+      syncRef.current = true;
+      setSyncing(true);
+      const result = await flushQueue((u) => addFn({ data: u }));
+      syncRef.current = false;
+      setSyncing(false);
       refreshPending();
-      if (n > 0) {
+      if (result.synced > 0) {
         qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
-        toast.success(`Synced ${n} offline update${n > 1 ? "s" : ""}`);
+        toast.success(`Synced ${result.synced} draft${result.synced > 1 ? "s" : ""}`);
+      }
+      if (result.failed > 0) {
+        toast.error("Could not sync yet", { description: "Your draft is still saved on this device." });
       }
     };
     const onOnline = () => { setOnline(true); flush(); };
@@ -146,21 +158,26 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
     };
-  }, [addFn, deptSlug, qc]);
+  }, [deptSlug]);
 
   const add = useMutation({
     mutationFn: (vars: { author_name: string; content: string; update_date?: string }) =>
       addFn({ data: vars }),
-    onSuccess: () => {
+    onSuccess: (row) => {
       setContent("");
+      qc.setQueryData(["updates", deptSlug], (old: unknown) => Array.isArray(old) ? [row, ...old] : [row]);
       qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
       toast.success("Update posted");
     },
     onError: (e: Error, vars) => {
-      queueUpdate(vars);
-      refreshPending();
-      setContent("");
-      toast.message("Saved offline — will sync when back online", { description: e.message });
+      if (!navigator.onLine) {
+        queueUpdate(vars);
+        refreshPending();
+        setContent("");
+        toast.message("Saved as draft — will sync when online");
+        return;
+      }
+      toast.error("Could not save update", { description: e.message });
     },
   });
 
@@ -181,7 +198,7 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
         </span>
       </div>
       <p className="mt-1 text-sm text-muted-foreground">
-        Post what your team did. Works offline — it will sync automatically when you're back online.
+        Post what your team did. Offline updates stay as drafts and sync automatically when you're back online.
       </p>
 
       <form
@@ -198,7 +215,7 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
             queueUpdate(vars);
             refreshPending();
             setContent("");
-            toast.message("Saved offline — will sync when back online");
+            toast.message("Saved as draft — will sync when online");
             return;
           }
           add.mutate(vars);
@@ -252,7 +269,7 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
         {pending.length > 0 && (
           <div className="rounded-lg border border-dashed border-amber-500/50 bg-amber-500/5 p-3">
             <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-              {pending.length} update{pending.length > 1 ? "s" : ""} waiting to sync
+              {pending.length} draft{pending.length > 1 ? "s" : ""} waiting to sync{syncing ? "…" : ""}
             </p>
             {pending.map((p) => (
               <div key={p.id} className="mt-2">

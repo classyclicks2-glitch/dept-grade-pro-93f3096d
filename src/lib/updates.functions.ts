@@ -41,10 +41,10 @@ export const addUpdate = createServerFn({ method: "POST" })
         content: data.content,
         ...(data.update_date ? { update_date: data.update_date } : {}),
       })
-      .select("id")
+      .select("id,department_slug,author_name,content,update_date,created_at")
       .single();
     if (error) throw new Error(error.message);
-    return { id: row.id };
+    return row;
   });
 
 export const deleteUpdate = createServerFn({ method: "POST" })
