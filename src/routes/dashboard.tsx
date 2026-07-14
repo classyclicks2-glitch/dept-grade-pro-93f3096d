@@ -117,11 +117,36 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
   const [date, setDate] = useState<Date>(new Date());
+  const [pending, setPending] = useState<PendingUpdate[]>([]);
+  const [online, setOnline] = useState(typeof navigator === "undefined" ? true : navigator.onLine);
 
   const { data: updates = [], isLoading } = useQuery({
     queryKey: ["updates", deptSlug],
     queryFn: () => fetchUpdates({ data: {} }),
   });
+
+  const refreshPending = () => setPending(getPending());
+
+  useEffect(() => {
+    refreshPending();
+    const flush = async () => {
+      const n = await flushQueue((u) => addFn({ data: u }));
+      refreshPending();
+      if (n > 0) {
+        qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
+        toast.success(`Synced ${n} offline update${n > 1 ? "s" : ""}`);
+      }
+    };
+    const onOnline = () => { setOnline(true); flush(); };
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    if (navigator.onLine) flush();
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+    };
+  }, [addFn, deptSlug, qc]);
 
   const add = useMutation({
     mutationFn: (vars: { author_name: string; content: string; update_date?: string }) =>
@@ -131,7 +156,12 @@ function DepartmentalUpdates({ deptSlug }: { deptSlug: string }) {
       qc.invalidateQueries({ queryKey: ["updates", deptSlug] });
       toast.success("Update posted");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error, vars) => {
+      queueUpdate(vars);
+      refreshPending();
+      setContent("");
+      toast.message("Saved offline — will sync when back online", { description: e.message });
+    },
   });
 
   const del = useMutation({
